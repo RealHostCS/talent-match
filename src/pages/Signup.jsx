@@ -1,3 +1,81 @@
+import { useState } from 'react'
+import { useNavigate, Link } from 'react-router-dom'
+import { supabase } from '../lib/supabase'
+
 export default function Signup() {
-  return null
+  const navigate = useNavigate()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [role, setRole] = useState('candidate')
+  const [fullName, setFullName] = useState('')
+  const [contact, setContact] = useState('')
+  const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
+
+  async function handleSubmit(e) {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+
+    const { data, error: authError } = await supabase.auth.signUp({ email, password })
+
+    if (authError) {
+      setError(authError.message)
+      setLoading(false)
+      return
+    }
+
+    const { error: profileError } = await supabase.from('profiles').insert({
+      id: data.user.id,
+      role,
+      full_name: fullName,
+      contact,
+    })
+
+    if (profileError) {
+      setError(profileError.message)
+      setLoading(false)
+      return
+    }
+
+    navigate('/profile')
+  }
+
+  return (
+    <main>
+      <h1>Create account</h1>
+      <form onSubmit={handleSubmit}>
+        <label>
+          Full name
+          <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} required />
+        </label>
+        <label>
+          Contact
+          <input type="text" value={contact} onChange={e => setContact(e.target.value)} required />
+        </label>
+        <label>
+          Email
+          <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+        </label>
+        <label>
+          Password
+          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+        </label>
+        <fieldset>
+          <legend>I am a</legend>
+          <label>
+            <input type="radio" name="role" value="candidate" checked={role === 'candidate'} onChange={() => setRole('candidate')} />
+            Candidate
+          </label>
+          <label>
+            <input type="radio" name="role" value="employer" checked={role === 'employer'} onChange={() => setRole('employer')} />
+            Employer
+          </label>
+        </fieldset>
+        {error && <p className="error">{error}</p>}
+        <button type="submit" disabled={loading}>{loading ? 'Creating account...' : 'Create account'}</button>
+      </form>
+      <p>Already have an account? <Link to="/login">Sign in</Link></p>
+    </main>
+  )
 }
