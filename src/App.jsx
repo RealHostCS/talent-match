@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
 import Nav from './components/Nav'
+import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
 import Signup from './pages/Signup'
 import CandidateProfile from './pages/CandidateProfile'
@@ -18,13 +19,41 @@ export default function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
-        <Route path="/profile" element={<CandidateProfile />} />
-        <Route path="/jobs" element={<CandidateHome />} />
-        <Route path="/jobs/:id" element={<JobDetail />} />
-        <Route path="/candidates" element={<EmployerHome />} />
-        <Route path="/candidates/:id" element={<CandidateDetail />} />
-        <Route path="/post-job" element={<PostJob />} />
-        <Route path="/employer-profile" element={<EmployerProfile />} />
+        <Route path="/profile" element={
+          <ProtectedRoute>
+            <CandidateProfile />
+          </ProtectedRoute>
+        } />
+        <Route path="/employer-profile" element={
+          <ProtectedRoute allowedRole="employer">
+            <EmployerProfile />
+          </ProtectedRoute>
+        } />
+        <Route path="/jobs" element={
+          <ProtectedRoute allowedRole="candidate">
+            <CandidateHome />
+          </ProtectedRoute>
+        } />
+        <Route path="/jobs/:id" element={
+          <ProtectedRoute allowedRole="candidate">
+            <JobDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="/candidates" element={
+          <ProtectedRoute allowedRole="employer">
+            <EmployerHome />
+          </ProtectedRoute>
+        } />
+        <Route path="/candidates/:id" element={
+          <ProtectedRoute allowedRole="employer">
+            <CandidateDetail />
+          </ProtectedRoute>
+        } />
+        <Route path="/post-job" element={
+          <ProtectedRoute allowedRole="employer">
+            <PostJob />
+          </ProtectedRoute>
+        } />
       </Routes>
     </BrowserRouter>
   )
