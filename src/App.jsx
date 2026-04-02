@@ -20,7 +20,7 @@ export default function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/profile" element={
-          <ProtectedRoute>
+          <ProtectedRoute allowedRole="candidate">
             <CandidateProfile />
           </ProtectedRoute>
         } />
@@ -35,7 +35,7 @@ export default function App() {
           </ProtectedRoute>
         } />
         <Route path="/jobs/:id" element={
-          <ProtectedRoute allowedRole="candidate">
+          <ProtectedRoute>
             <JobDetail />
           </ProtectedRoute>
         } />
