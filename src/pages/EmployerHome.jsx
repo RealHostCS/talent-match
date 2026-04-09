@@ -3,12 +3,46 @@ import { supabase } from '../lib/supabase'
 import CandidateCard from '../components/CandidateCard'
 
 export default function EmployerHome() {
+  const [recommended, setRecommended] = useState([])
   const [candidates, setCandidates] = useState([])
   const [nameSearch, setNameSearch] = useState('')
   const [skillFilter, setSkillFilter] = useState('')
   const [educationFilter, setEducationFilter] = useState('')
   const [minExperience, setMinExperience] = useState('')
   const [loading, setLoading] = useState(true)
+
+  useEffect(() => {
+    async function loadRecommended() {
+      const { data: { user } } = await supabase.auth.getUser()
+
+      const { data: jobs } = await supabase
+        .from('jobs')
+        .select('id')
+        .eq('employer_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(1)
+
+      if (jobs && jobs.length > 0) {
+        const { data: recData } = await supabase.rpc('recommend_candidates_for_job', {
+          job_id: jobs[0].id,
+        })
+
+        if (recData && recData.length > 0) {
+          const ids = recData.map(r => r.id)
+          const { data: profiles } = await supabase
+            .from('profiles')
+            .select('id, full_name')
+            .in('id', ids)
+
+          const profileMap = {}
+          profiles?.forEach(p => { profileMap[p.id] = p })
+
+          setRecommended(recData.map(r => ({ ...r, profiles: profileMap[r.id] })))
+        }
+      }
+    }
+    loadRecommended()
+  }, [])
 
   useEffect(() => {
     async function load() {
@@ -37,22 +71,32 @@ export default function EmployerHome() {
 
   return (
     <main>
-      <h1>Find candidates</h1>
-      <div className="filters">
-        <input type="search" placeholder="Search by name..." value={nameSearch} onChange={e => setNameSearch(e.target.value)} />
-        <input type="text" placeholder="Filter by skill..." value={skillFilter} onChange={e => setSkillFilter(e.target.value)} />
-        <input type="text" placeholder="Filter by education..." value={educationFilter} onChange={e => setEducationFilter(e.target.value)} />
-        <input type="number" min="0" placeholder="Min years exp..." value={minExperience} onChange={e => setMinExperience(e.target.value)} />
-      </div>
-      {loading ? (
-        <p>Loading...</p>
-      ) : candidates.length === 0 ? (
-        <p>No candidates found.</p>
-      ) : (
-        <div className="card-list">
-          {candidates.map(c => <CandidateCard key={c.id} candidate={c} />)}
-        </div>
+      {recommended.length > 0 && (
+        <section>
+          <h2>Recommended candidates</h2>
+          <div className="card-list">
+            {recommended.map(c => <CandidateCard key={c.id} candidate={c} />)}
+          </div>
+        </section>
       )}
+      <section>
+        <h2>All candidates</h2>
+        <div className="filters">
+          <input type="search" placeholder="Search by name..." value={nameSearch} onChange={e => setNameSearch(e.target.value)} />
+          <input type="text" placeholder="Filter by skill..." value={skillFilter} onChange={e => setSkillFilter(e.target.value)} />
+          <input type="text" placeholder="Filter by education..." value={educationFilter} onChange={e => setEducationFilter(e.target.value)} />
+          <input type="number" min="0" placeholder="Min years exp..." value={minExperience} onChange={e => setMinExperience(e.target.value)} />
+        </div>
+        {loading ? (
+          <p>Loading...</p>
+        ) : candidates.length === 0 ? (
+          <p>No candidates found.</p>
+        ) : (
+          <div className="card-list">
+            {candidates.map(c => <CandidateCard key={c.id} candidate={c} />)}
+          </div>
+        )}
+      </section>
     </main>
   )
 }
