@@ -71,7 +71,7 @@ export default function CandidateProfile() {
         id: user.id,
         education,
         field_of_study: fieldOfStudy,
-        years_experience: parseInt(yearsExperience, 10),
+        years_experience: yearsExperience === '' ? 0 : parseInt(yearsExperience, 10),
         skills: skillsArray,
       })
 
