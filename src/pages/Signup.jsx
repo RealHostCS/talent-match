@@ -17,7 +17,13 @@ export default function Signup() {
     setError('')
     setLoading(true)
 
-    const { data, error: authError } = await supabase.auth.signUp({ email, password })
+    const { data, error: authError } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        data: { role, full_name: fullName, contact },
+      },
+    })
 
     if (authError) {
       setError(authError.message)
@@ -25,15 +31,8 @@ export default function Signup() {
       return
     }
 
-    const { error: profileError } = await supabase.from('profiles').insert({
-      id: data.user.id,
-      role,
-      full_name: fullName,
-      contact,
-    })
-
-    if (profileError) {
-      setError(profileError.message)
+    if (!data.session) {
+      setError('Account created. Please check your email to confirm before signing in.')
       setLoading(false)
       return
     }
