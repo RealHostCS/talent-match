@@ -12,12 +12,12 @@ export default function ProtectedRoute({ children, allowedRole }) {
         setState({ loading: false, user: null, role: null })
         return
       }
-      const { data: profile } = await supabase
+      const { data: profile, error: profileError } = await supabase
         .from('profiles')
         .select('role')
         .eq('id', user.id)
         .single()
-      setState({ loading: false, user, role: profile?.role ?? null })
+      setState({ loading: false, user, role: profileError ? null : (profile?.role ?? null) })
     }
     check()
   }, [])

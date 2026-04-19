@@ -44,6 +44,11 @@ export default function PostJob() {
       return
     }
 
+    if (!data) {
+      setError('Failed to create job posting.')
+      setLoading(false)
+      return
+    }
     navigate(`/jobs/${data.id}`)
   }
 

@@ -17,7 +17,7 @@ export default function CandidateHome() {
         supabase.from('jobs').select('*').order('created_at', { ascending: false }),
       ])
 
-      setRecommended(recResult.data || [])
+      setRecommended(recResult.error ? [] : (recResult.data || []))
       setJobs(allResult.data || [])
       setLoading(false)
     }
