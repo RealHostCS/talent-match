@@ -7,23 +7,27 @@ export default function ProtectedRoute({ children, allowedRole }) {
 
   useEffect(() => {
     async function check() {
-      const { data: { user } } = await supabase.auth.getUser()
-      if (!user) {
+      try {
+        const { data: { user } } = await supabase.auth.getUser()
+        if (!user) {
+          setState({ loading: false, user: null, role: null })
+          return
+        }
+        const { data: profile, error: profileError } = await supabase
+          .from('profiles')
+          .select('role')
+          .eq('id', user.id)
+          .single()
+        setState({ loading: false, user, role: profileError ? null : (profile?.role ?? null) })
+      } catch {
         setState({ loading: false, user: null, role: null })
-        return
       }
-      const { data: profile, error: profileError } = await supabase
-        .from('profiles')
-        .select('role')
-        .eq('id', user.id)
-        .single()
-      setState({ loading: false, user, role: profileError ? null : (profile?.role ?? null) })
     }
     check()
   }, [])
 
-  if (state.loading) return null
-  if (!state.user) return <Navigate to="/login" replace />
+  if (state.loading) return <main><p>Loading...</p></main>
+  if (!state.user || !state.role) return <Navigate to="/login" replace />
   if (allowedRole && state.role !== allowedRole) {
     return <Navigate to={state.role === 'employer' ? '/candidates' : '/jobs'} replace />
   }
