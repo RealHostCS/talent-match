@@ -28,7 +28,14 @@ export default function Login() {
       .eq('id', data.user.id)
       .single()
 
-    if (profile?.role === 'employer') {
+    if (!profile) {
+      await supabase.auth.signOut()
+      setError('Account setup is incomplete. Please sign up again.')
+      setLoading(false)
+      return
+    }
+
+    if (profile.role === 'employer') {
       navigate('/candidates')
     } else {
       navigate('/jobs')
