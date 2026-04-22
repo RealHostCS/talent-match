@@ -40,7 +40,7 @@ export default function CandidateDetail() {
       <p>Contact: {profile?.contact}</p>
       <p>{candidate.field_of_study} &middot; {candidate.education}</p>
       <p>{candidate.years_experience} yr{candidate.years_experience !== 1 ? 's' : ''} experience</p>
-      {candidate.skills.length > 0 && (
+      {candidate.skills?.length > 0 && (
         <p><strong>Skills:</strong> {candidate.skills.join(', ')}</p>
       )}
     </main>

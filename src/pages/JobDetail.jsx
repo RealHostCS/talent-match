@@ -40,7 +40,7 @@ export default function JobDetail() {
       {company && <p className="subtitle">{company.company_name}</p>}
       <p>{job.location} &middot; {job.work_mode}</p>
       <p>{job.required_experience} yr{job.required_experience !== 1 ? 's' : ''} experience required &middot; {job.required_education}</p>
-      {job.required_skills.length > 0 && (
+      {job.required_skills?.length > 0 && (
         <p><strong>Skills:</strong> {job.required_skills.join(', ')}</p>
       )}
       <h2>Description</h2>
