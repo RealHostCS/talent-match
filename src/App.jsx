@@ -1,4 +1,6 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import { BrowserRouter, Routes, Route, useNavigate } from 'react-router-dom'
+import { supabase } from './lib/supabase'
 import Nav from './components/Nav'
 import ProtectedRoute from './components/ProtectedRoute'
 import Login from './pages/Login'
@@ -11,12 +13,33 @@ import PostJob from './pages/PostJob'
 import JobDetail from './pages/JobDetail'
 import CandidateDetail from './pages/CandidateDetail'
 
+function RootRedirect() {
+  const navigate = useNavigate()
+  useEffect(() => {
+    async function redirect() {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user) { navigate('/login', { replace: true }); return }
+      const { data: profile } = await supabase
+        .from('profiles').select('role').eq('id', user.id).single()
+      if (profile?.role === 'employer') {
+        navigate('/candidates', { replace: true })
+      } else if (profile?.role === 'candidate') {
+        navigate('/jobs', { replace: true })
+      } else {
+        navigate('/login', { replace: true })
+      }
+    }
+    redirect()
+  }, [navigate])
+  return <main><p>Loading...</p></main>
+}
+
 export default function App() {
   return (
     <BrowserRouter basename="/talent-match">
       <Nav />
       <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
+        <Route path="/" element={<RootRedirect />} />
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/profile" element={
