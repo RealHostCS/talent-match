@@ -25,13 +25,10 @@ export default function CandidateHome() {
   }, [])
 
   useEffect(() => {
-    if (!query) return
     async function search() {
-      const { data } = await supabase
-        .from('jobs')
-        .select('*')
-        .order('created_at', { ascending: false })
-        .ilike('description', `%${query}%`)
+      let q = supabase.from('jobs').select('*').order('created_at', { ascending: false })
+      if (query) q = q.ilike('description', `%${query}%`)
+      const { data } = await q
       setJobs(data || [])
     }
     search()
