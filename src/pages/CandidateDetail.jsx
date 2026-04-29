@@ -43,6 +43,18 @@ export default function CandidateDetail() {
       {candidate.skills?.length > 0 && (
         <p><strong>Skills:</strong> {candidate.skills.join(', ')}</p>
       )}
+      {candidate.work_experience && (
+        <>
+          <h2>Work experience</h2>
+          <p>{candidate.work_experience}</p>
+        </>
+      )}
+      {(candidate.preferred_work_mode || candidate.preferred_location) && (
+        <p>
+          <strong>Preferences:</strong>{' '}
+          {[candidate.preferred_work_mode, candidate.preferred_location].filter(Boolean).join(', ')}
+        </p>
+      )}
     </main>
   )
 }

@@ -6,6 +6,9 @@ export default function CandidateProfile() {
   const [fieldOfStudy, setFieldOfStudy] = useState('')
   const [yearsExperience, setYearsExperience] = useState('')
   const [skills, setSkills] = useState('')
+  const [workExperience, setWorkExperience] = useState('')
+  const [preferredWorkMode, setPreferredWorkMode] = useState('')
+  const [preferredLocation, setPreferredLocation] = useState('')
   const [fullName, setFullName] = useState('')
   const [contact, setContact] = useState('')
   const [error, setError] = useState('')
@@ -39,6 +42,9 @@ export default function CandidateProfile() {
         setFieldOfStudy(candidate.field_of_study)
         setYearsExperience(String(candidate.years_experience))
         setSkills(candidate.skills.join(', '))
+        setWorkExperience(candidate.work_experience || '')
+        setPreferredWorkMode(candidate.preferred_work_mode || '')
+        setPreferredLocation(candidate.preferred_location || '')
       }
 
       setLoading(false)
@@ -73,6 +79,9 @@ export default function CandidateProfile() {
         field_of_study: fieldOfStudy,
         years_experience: yearsExperience === '' ? 0 : parseInt(yearsExperience, 10),
         skills: skillsArray,
+        work_experience: workExperience,
+        preferred_work_mode: preferredWorkMode || null,
+        preferred_location: preferredLocation,
       })
 
     if (candidateError) {
@@ -112,6 +121,23 @@ export default function CandidateProfile() {
         <label>
           Skills (comma-separated)
           <input type="text" value={skills} onChange={e => setSkills(e.target.value)} />
+        </label>
+        <label>
+          Work experience
+          <textarea value={workExperience} onChange={e => setWorkExperience(e.target.value)} rows={4} />
+        </label>
+        <label>
+          Preferred working mode
+          <select value={preferredWorkMode} onChange={e => setPreferredWorkMode(e.target.value)}>
+            <option value="">No preference</option>
+            <option>Remote</option>
+            <option>On-site</option>
+            <option>Hybrid</option>
+          </select>
+        </label>
+        <label>
+          Preferred location
+          <input type="text" value={preferredLocation} onChange={e => setPreferredLocation(e.target.value)} />
         </label>
         {error && <p className="error">{error}</p>}
         {saved && <p className="success">Saved.</p>}
