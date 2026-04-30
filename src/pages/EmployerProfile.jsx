@@ -6,6 +6,7 @@ export default function EmployerProfile() {
   const [contact, setContact] = useState('')
   const [companyName, setCompanyName] = useState('')
   const [companyInfo, setCompanyInfo] = useState('')
+  const [isMember, setIsMember] = useState(false)
   const [error, setError] = useState('')
   const [saved, setSaved] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -17,13 +18,14 @@ export default function EmployerProfile() {
 
       const { data: profile } = await supabase
         .from('profiles')
-        .select('full_name, contact')
+        .select('full_name, contact, is_member')
         .eq('id', user.id)
         .single()
 
       if (profile) {
         setFullName(profile.full_name)
         setContact(profile.contact)
+        setIsMember(profile.is_member)
       }
 
       const { data: company } = await supabase
@@ -71,6 +73,16 @@ export default function EmployerProfile() {
     setSaved(true)
   }
 
+  async function toggleMembership() {
+    const { data: { user } } = await supabase.auth.getUser()
+    const next = !isMember
+    const { error: memberError } = await supabase
+      .from('profiles')
+      .update({ is_member: next })
+      .eq('id', user.id)
+    if (!memberError) setIsMember(next)
+  }
+
   if (loading) return <main><p>Loading...</p></main>
 
   return (
@@ -97,6 +109,13 @@ export default function EmployerProfile() {
         {saved && <p className="success">Saved.</p>}
         <button type="submit">Save</button>
       </form>
+      <section className="membership">
+        <h2>Membership</h2>
+        <p>{isMember ? 'Active - unlimited recommendations' : 'Free - top 10 recommendations'}</p>
+        <button type="button" onClick={toggleMembership}>
+          {isMember ? 'Cancel membership' : 'Activate membership'}
+        </button>
+      </section>
     </main>
   )
 }
