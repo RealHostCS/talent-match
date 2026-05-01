@@ -15,6 +15,14 @@ export default function EmployerHome() {
     async function loadRecommended() {
       const { data: { user } } = await supabase.auth.getUser()
 
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_member')
+        .eq('id', user.id)
+        .single()
+
+      const limit = profile?.is_member ? 2147483647 : 10
+
       const { data: jobs } = await supabase
         .from('jobs')
         .select('id')
@@ -25,6 +33,7 @@ export default function EmployerHome() {
       if (jobs && jobs.length > 0) {
         const { data: recData } = await supabase.rpc('recommend_candidates_for_job', {
           job_id: jobs[0].id,
+          p_limit: limit,
         })
 
         if (recData && recData.length > 0) {

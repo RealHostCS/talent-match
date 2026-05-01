@@ -12,8 +12,16 @@ export default function CandidateHome() {
     async function load() {
       const { data: { user } } = await supabase.auth.getUser()
 
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_member')
+        .eq('id', user.id)
+        .single()
+
+      const limit = profile?.is_member ? 2147483647 : 10
+
       const [recResult, allResult] = await Promise.all([
-        supabase.rpc('recommend_jobs_for_candidate', { candidate_id: user.id }),
+        supabase.rpc('recommend_jobs_for_candidate', { candidate_id: user.id, p_limit: limit }),
         supabase.from('jobs').select('*').order('created_at', { ascending: false }),
       ])
 
