@@ -5,10 +5,12 @@ import CandidateCard from '../components/CandidateCard'
 export default function EmployerHome() {
   const [recommended, setRecommended] = useState([])
   const [candidates, setCandidates] = useState([])
-  const [nameSearch, setNameSearch] = useState('')
+  const [query, setQuery] = useState('')
   const [skillFilter, setSkillFilter] = useState('')
   const [educationFilter, setEducationFilter] = useState('')
   const [minExperience, setMinExperience] = useState('')
+  const [workModeFilter, setWorkModeFilter] = useState('')
+  const [locationFilter, setLocationFilter] = useState('')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -37,16 +39,7 @@ export default function EmployerHome() {
         })
 
         if (recData && recData.length > 0) {
-          const ids = recData.map(r => r.id)
-          const { data: profiles } = await supabase
-            .from('profiles')
-            .select('id, full_name')
-            .in('id', ids)
-
-          const profileMap = {}
-          profiles?.forEach(p => { profileMap[p.id] = p })
-
-          setRecommended(recData.map(r => ({ ...r, profiles: profileMap[r.id] })))
+          setRecommended(recData)
         }
       }
     }
@@ -55,28 +48,19 @@ export default function EmployerHome() {
 
   useEffect(() => {
     async function load() {
-      let q = supabase
-        .from('candidates')
-        .select('*, profiles(full_name)')
-        .order('id')
-
-      if (skillFilter) q = q.contains('skills', [skillFilter.trim()])
-      if (educationFilter) q = q.ilike('education', `%${educationFilter}%`)
-      if (minExperience !== '') q = q.gte('years_experience', parseInt(minExperience, 10))
-
-      const { data } = await q
-      let results = data || []
-
-      if (nameSearch) {
-        const lower = nameSearch.toLowerCase()
-        results = results.filter(c => c.profiles?.full_name?.toLowerCase().includes(lower))
-      }
-
-      setCandidates(results)
+      const { data } = await supabase.rpc('search_candidates', {
+        p_query: query,
+        p_skill: skillFilter,
+        p_education: educationFilter,
+        p_min_experience: minExperience === '' ? 0 : parseInt(minExperience, 10),
+        p_work_mode: workModeFilter,
+        p_location: locationFilter,
+      })
+      setCandidates(data || [])
       setLoading(false)
     }
     load()
-  }, [nameSearch, skillFilter, educationFilter, minExperience])
+  }, [query, skillFilter, educationFilter, minExperience, workModeFilter, locationFilter])
 
   return (
     <main>
@@ -91,10 +75,17 @@ export default function EmployerHome() {
       <section>
         <h2>All candidates</h2>
         <div className="filters">
-          <input type="search" placeholder="Search by name..." value={nameSearch} onChange={e => setNameSearch(e.target.value)} />
+          <input type="search" placeholder="Search by keyword..." value={query} onChange={e => setQuery(e.target.value)} />
           <input type="text" placeholder="Filter by skill..." value={skillFilter} onChange={e => setSkillFilter(e.target.value)} />
           <input type="text" placeholder="Filter by education..." value={educationFilter} onChange={e => setEducationFilter(e.target.value)} />
           <input type="number" min="0" placeholder="Min years exp..." value={minExperience} onChange={e => setMinExperience(e.target.value)} />
+          <select value={workModeFilter} onChange={e => setWorkModeFilter(e.target.value)}>
+            <option value="">All work modes</option>
+            <option>Remote</option>
+            <option>On-site</option>
+            <option>Hybrid</option>
+          </select>
+          <input type="text" placeholder="Filter by location..." value={locationFilter} onChange={e => setLocationFilter(e.target.value)} />
         </div>
         {loading ? (
           <p>Loading...</p>

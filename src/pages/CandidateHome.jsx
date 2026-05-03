@@ -6,6 +6,8 @@ export default function CandidateHome() {
   const [recommended, setRecommended] = useState([])
   const [jobs, setJobs] = useState([])
   const [query, setQuery] = useState('')
+  const [workMode, setWorkMode] = useState('')
+  const [location, setLocation] = useState('')
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
@@ -20,13 +22,13 @@ export default function CandidateHome() {
 
       const limit = profile?.is_member ? 2147483647 : 10
 
-      const [recResult, allResult] = await Promise.all([
+      const [recResult, searchResult] = await Promise.all([
         supabase.rpc('recommend_jobs_for_candidate', { candidate_id: user.id, p_limit: limit }),
-        supabase.from('jobs').select('*').order('created_at', { ascending: false }),
+        supabase.rpc('search_jobs', { p_query: '', p_work_mode: '', p_location: '' }),
       ])
 
       setRecommended(recResult.error ? [] : (recResult.data || []))
-      setJobs(allResult.data || [])
+      setJobs(searchResult.data || [])
       setLoading(false)
     }
     load()
@@ -34,13 +36,15 @@ export default function CandidateHome() {
 
   useEffect(() => {
     async function search() {
-      let q = supabase.from('jobs').select('*').order('created_at', { ascending: false })
-      if (query) q = q.ilike('description', `%${query}%`)
-      const { data } = await q
+      const { data } = await supabase.rpc('search_jobs', {
+        p_query: query,
+        p_work_mode: workMode,
+        p_location: location,
+      })
       setJobs(data || [])
     }
     search()
-  }, [query])
+  }, [query, workMode, location])
 
   if (loading) return <main><p>Loading...</p></main>
 
@@ -56,12 +60,26 @@ export default function CandidateHome() {
       )}
       <section>
         <h2>All jobs</h2>
-        <input
-          type="search"
-          placeholder="Search by keyword..."
-          value={query}
-          onChange={e => setQuery(e.target.value)}
-        />
+        <div className="filters">
+          <input
+            type="search"
+            placeholder="Search by keyword..."
+            value={query}
+            onChange={e => setQuery(e.target.value)}
+          />
+          <select value={workMode} onChange={e => setWorkMode(e.target.value)}>
+            <option value="">All work modes</option>
+            <option>Remote</option>
+            <option>On-site</option>
+            <option>Hybrid</option>
+          </select>
+          <input
+            type="text"
+            placeholder="Filter by location..."
+            value={location}
+            onChange={e => setLocation(e.target.value)}
+          />
+        </div>
         {jobs.length === 0 ? (
           <p>No jobs found.</p>
         ) : (
