@@ -62,18 +62,56 @@ export default function EmployerHome() {
     load()
   }, [query, skillFilter, educationFilter, minExperience, workModeFilter, locationFilter])
 
+  const locationCount = new Set(candidates.map(candidate => candidate.preferred_location).filter(Boolean)).size
+  const remoteCount = candidates.filter(candidate => candidate.preferred_work_mode === 'Remote').length
+  const experiencedCount = candidates.filter(candidate => candidate.years_experience >= 2).length
+
   return (
-    <main>
+    <main className="dashboard">
+      <section className="page-hero">
+        <div>
+          <p className="eyebrow">Employer workspace</p>
+          <h1>Review candidates</h1>
+        </div>
+        <div className="metric-grid">
+          <div className="metric">
+            <span>{candidates.length}</span>
+            <p>Candidates</p>
+          </div>
+          <div className="metric">
+            <span>{recommended.length}</span>
+            <p>Recommended</p>
+          </div>
+          <div className="metric">
+            <span>{locationCount}</span>
+            <p>Locations</p>
+          </div>
+          <div className="metric">
+            <span>{remoteCount}</span>
+            <p>Remote ready</p>
+          </div>
+          <div className="metric">
+            <span>{experiencedCount}</span>
+            <p>2+ yrs exp</p>
+          </div>
+        </div>
+      </section>
       {recommended.length > 0 && (
-        <section>
-          <h2>Recommended candidates</h2>
+        <section className="content-section">
+          <div className="section-head">
+            <h2>Recommended candidates</h2>
+            <span>{recommended.length} matches</span>
+          </div>
           <div className="card-list">
             {recommended.map(c => <CandidateCard key={c.id} candidate={c} />)}
           </div>
         </section>
       )}
-      <section>
-        <h2>All candidates</h2>
+      <section className="content-section">
+        <div className="section-head">
+          <h2>All candidates</h2>
+          <span>{candidates.length} results</span>
+        </div>
         <div className="filters">
           <input type="search" placeholder="Search by keyword..." value={query} onChange={e => setQuery(e.target.value)} />
           <input type="text" placeholder="Filter by skill..." value={skillFilter} onChange={e => setSkillFilter(e.target.value)} />

@@ -36,7 +36,7 @@ function RootRedirect() {
 
 export default function App() {
   return (
-    <BrowserRouter basename="/talent-match">
+    <BrowserRouter>
       <Nav />
       <Routes>
         <Route path="/" element={<RootRedirect />} />

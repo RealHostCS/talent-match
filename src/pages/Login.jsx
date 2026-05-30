@@ -43,21 +43,23 @@ export default function Login() {
   }
 
   return (
-    <main>
-      <h1>Sign in</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Email
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
-        </label>
-        <label>
-          Password
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
-        </label>
-        {error && <p className="error">{error}</p>}
-        <button type="submit" disabled={loading}>{loading ? 'Signing in...' : 'Sign in'}</button>
-      </form>
-      <p>No account? <Link to="/signup">Sign up</Link></p>
+    <main className="auth-page">
+      <section className="auth-panel">
+        <h1>Sign in</h1>
+        <form onSubmit={handleSubmit}>
+          <label>
+            Email
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+          </label>
+          <label>
+            Password
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required />
+          </label>
+          {error && <p className="error">{error}</p>}
+          <button type="submit" disabled={loading}>{loading ? 'Signing in...' : 'Sign in'}</button>
+        </form>
+        <p className="auth-switch">No account? <Link to="/signup">Sign up</Link></p>
+      </section>
     </main>
   )
 }

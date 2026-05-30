@@ -106,62 +106,106 @@ export default function CandidateProfile() {
 
   if (loading) return <main><p>Loading...</p></main>
 
+  const skillsList = skills.split(',').map(skill => skill.trim()).filter(Boolean)
+
   return (
-    <main>
-      <h1>My profile</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Full name
-          <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} required />
-        </label>
-        <label>
-          Contact
-          <input type="text" value={contact} onChange={e => setContact(e.target.value)} required />
-        </label>
-        <label>
-          Education level
-          <input type="text" value={education} onChange={e => setEducation(e.target.value)} required />
-        </label>
-        <label>
-          Field of study
-          <input type="text" value={fieldOfStudy} onChange={e => setFieldOfStudy(e.target.value)} required />
-        </label>
-        <label>
-          Years of experience
-          <input type="number" min="0" value={yearsExperience} onChange={e => setYearsExperience(e.target.value)} required />
-        </label>
-        <label>
-          Skills (comma-separated)
-          <input type="text" value={skills} onChange={e => setSkills(e.target.value)} />
-        </label>
-        <label>
-          Work experience
-          <textarea value={workExperience} onChange={e => setWorkExperience(e.target.value)} rows={4} />
-        </label>
-        <label>
-          Preferred working mode
-          <select value={preferredWorkMode} onChange={e => setPreferredWorkMode(e.target.value)}>
-            <option value="">No preference</option>
-            <option>Remote</option>
-            <option>On-site</option>
-            <option>Hybrid</option>
-          </select>
-        </label>
-        <label>
-          Preferred location
-          <input type="text" value={preferredLocation} onChange={e => setPreferredLocation(e.target.value)} />
-        </label>
-        {error && <p className="error">{error}</p>}
-        {saved && <p className="success">Saved.</p>}
-        <button type="submit">Save</button>
-      </form>
-      <section className="membership">
-        <h2>Membership</h2>
-        <p>{isMember ? 'Active - unlimited recommendations' : 'Free - top 10 recommendations'}</p>
-        <button type="button" onClick={toggleMembership}>
-          {isMember ? 'Cancel membership' : 'Activate membership'}
-        </button>
+    <main className="profile-page">
+      <section className="profile-hero">
+        <div>
+          <p className="eyebrow">Candidate profile</p>
+          <h1>{fullName || 'My profile'}</h1>
+          <p>Keep your profile complete so job recommendations can better match your skills, experience, and preferred location.</p>
+        </div>
+        <span className={isMember ? 'status-pill active' : 'status-pill'}>{isMember ? 'Member' : 'Free plan'}</span>
       </section>
+
+      <div className="profile-layout">
+        <aside className="profile-summary">
+          <div className="avatar">{(fullName || 'C').slice(0, 1).toUpperCase()}</div>
+          <h2>{fullName || 'Candidate'}</h2>
+          <p>{fieldOfStudy || 'Field of study not set'}</p>
+          <dl>
+            <div>
+              <dt>Experience</dt>
+              <dd>{yearsExperience || 0} yrs</dd>
+            </div>
+            <div>
+              <dt>Work mode</dt>
+              <dd>{preferredWorkMode || 'Flexible'}</dd>
+            </div>
+            <div>
+              <dt>Location</dt>
+              <dd>{preferredLocation || 'Not set'}</dd>
+            </div>
+          </dl>
+          <div className="skill-cloud">
+            {skillsList.length > 0 ? skillsList.slice(0, 8).map(skill => <span key={skill}>{skill}</span>) : <span>No skills added</span>}
+          </div>
+          <section className="membership compact">
+            <h2>Membership</h2>
+            <p>{isMember ? 'Active - unlimited recommendations' : 'Free - top 10 recommendations'}</p>
+            <button type="button" onClick={toggleMembership}>
+              {isMember ? 'Cancel membership' : 'Activate membership'}
+            </button>
+          </section>
+        </aside>
+
+        <form className="profile-form" onSubmit={handleSubmit}>
+          <div className="form-section-title">
+            <h2>Personal information</h2>
+            <p>Basic contact details used by employers.</p>
+          </div>
+          <label>
+            Full name
+            <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} required />
+          </label>
+          <label>
+            Contact
+            <input type="text" value={contact} onChange={e => setContact(e.target.value)} required />
+          </label>
+
+          <div className="form-section-title wide">
+            <h2>Candidate details</h2>
+            <p>These fields drive the recommendation score.</p>
+          </div>
+          <label>
+            Education level
+            <input type="text" value={education} onChange={e => setEducation(e.target.value)} required />
+          </label>
+          <label>
+            Field of study
+            <input type="text" value={fieldOfStudy} onChange={e => setFieldOfStudy(e.target.value)} required />
+          </label>
+          <label>
+            Years of experience
+            <input type="number" min="0" value={yearsExperience} onChange={e => setYearsExperience(e.target.value)} required />
+          </label>
+          <label>
+            Preferred working mode
+            <select value={preferredWorkMode} onChange={e => setPreferredWorkMode(e.target.value)}>
+              <option value="">No preference</option>
+              <option>Remote</option>
+              <option>On-site</option>
+              <option>Hybrid</option>
+            </select>
+          </label>
+          <label>
+            Preferred location
+            <input type="text" value={preferredLocation} onChange={e => setPreferredLocation(e.target.value)} />
+          </label>
+          <label>
+            Skills (comma-separated)
+            <input type="text" value={skills} onChange={e => setSkills(e.target.value)} />
+          </label>
+          <label className="wide">
+            Work experience
+            <textarea value={workExperience} onChange={e => setWorkExperience(e.target.value)} rows={4} />
+          </label>
+          {error && <p className="error wide">{error}</p>}
+          {saved && <p className="success wide">Saved.</p>}
+          <button type="submit">Save profile</button>
+        </form>
+      </div>
     </main>
   )
 }

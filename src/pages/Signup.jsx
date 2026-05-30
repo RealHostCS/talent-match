@@ -45,40 +45,42 @@ export default function Signup() {
   }
 
   return (
-    <main>
-      <h1>Create account</h1>
-      <form onSubmit={handleSubmit}>
-        <label>
-          Full name
-          <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} required />
-        </label>
-        <label>
-          Contact
-          <input type="text" value={contact} onChange={e => setContact(e.target.value)} required />
-        </label>
-        <label>
-          Email
-          <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
-        </label>
-        <label>
-          Password
-          <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
-        </label>
-        <fieldset>
-          <legend>I am a</legend>
+    <main className="auth-page">
+      <section className="auth-panel">
+        <h1>Create account</h1>
+        <form onSubmit={handleSubmit}>
           <label>
-            <input type="radio" name="role" value="candidate" checked={role === 'candidate'} onChange={() => setRole('candidate')} />
-            Candidate
+            Full name
+            <input type="text" value={fullName} onChange={e => setFullName(e.target.value)} required />
           </label>
           <label>
-            <input type="radio" name="role" value="employer" checked={role === 'employer'} onChange={() => setRole('employer')} />
-            Employer
+            Contact
+            <input type="text" value={contact} onChange={e => setContact(e.target.value)} required />
           </label>
-        </fieldset>
-        {error && <p className="error">{error}</p>}
-        <button type="submit" disabled={loading}>{loading ? 'Creating account...' : 'Create account'}</button>
-      </form>
-      <p>Already have an account? <Link to="/login">Sign in</Link></p>
+          <label>
+            Email
+            <input type="email" value={email} onChange={e => setEmail(e.target.value)} required />
+          </label>
+          <label>
+            Password
+            <input type="password" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
+          </label>
+          <fieldset>
+            <legend>I am a</legend>
+            <label>
+              <input type="radio" name="role" value="candidate" checked={role === 'candidate'} onChange={() => setRole('candidate')} />
+              Candidate
+            </label>
+            <label>
+              <input type="radio" name="role" value="employer" checked={role === 'employer'} onChange={() => setRole('employer')} />
+              Employer
+            </label>
+          </fieldset>
+          {error && <p className="error">{error}</p>}
+          <button type="submit" disabled={loading}>{loading ? 'Creating account...' : 'Create account'}</button>
+        </form>
+        <p className="auth-switch">Already have an account? <Link to="/login">Sign in</Link></p>
+      </section>
     </main>
   )
 }

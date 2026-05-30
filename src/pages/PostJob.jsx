@@ -9,8 +9,11 @@ export default function PostJob() {
   const [requiredEducation, setRequiredEducation] = useState('')
   const [requiredSkills, setRequiredSkills] = useState('')
   const [requiredExperience, setRequiredExperience] = useState('')
+  const [jobType, setJobType] = useState('Full-time')
   const [workMode, setWorkMode] = useState('On-site')
   const [location, setLocation] = useState('')
+  const [salaryMin, setSalaryMin] = useState('')
+  const [salaryMax, setSalaryMax] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
 
@@ -32,8 +35,11 @@ export default function PostJob() {
         required_education: requiredEducation,
         required_skills: skillsArray,
         required_experience: parseInt(requiredExperience, 10),
+        job_type: jobType,
         work_mode: workMode,
         location,
+        salary_min: salaryMin === '' ? null : parseInt(salaryMin, 10),
+        salary_max: salaryMax === '' ? null : parseInt(salaryMax, 10),
       })
       .select()
       .single()
@@ -77,6 +83,15 @@ export default function PostJob() {
           <input type="number" min="0" value={requiredExperience} onChange={e => setRequiredExperience(e.target.value)} required />
         </label>
         <label>
+          Job type
+          <select value={jobType} onChange={e => setJobType(e.target.value)}>
+            <option>Full-time</option>
+            <option>Part-time</option>
+            <option>Internship</option>
+            <option>Contract</option>
+          </select>
+        </label>
+        <label>
           Work mode
           <select value={workMode} onChange={e => setWorkMode(e.target.value)}>
             <option>Remote</option>
@@ -87,6 +102,14 @@ export default function PostJob() {
         <label>
           Location
           <input type="text" value={location} onChange={e => setLocation(e.target.value)} required />
+        </label>
+        <label>
+          Minimum salary
+          <input type="number" min="0" value={salaryMin} onChange={e => setSalaryMin(e.target.value)} />
+        </label>
+        <label>
+          Maximum salary
+          <input type="number" min="0" value={salaryMax} onChange={e => setSalaryMax(e.target.value)} />
         </label>
         {error && <p className="error">{error}</p>}
         <button type="submit" disabled={loading}>{loading ? 'Posting...' : 'Post job'}</button>
