@@ -36,7 +36,7 @@ export default function Nav() {
   }
 
   return (
-    <nav>
+    <nav style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '16px 24px' }}>
       <Link to={role === 'employer' ? '/candidates' : role === 'candidate' ? '/jobs' : '/login'} className="nav-brand">
         Talent Match
       </Link>
